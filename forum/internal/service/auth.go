@@ -6,10 +6,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"time"
-
 	"forum/internal/models"
 	"forum/internal/repository"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,10 +21,9 @@ type Authorization interface {
 }
 
 var (
-	ErrNoUser        = errors.New("user doesn't exist")
-	ErrWrongPassword = errors.New("wrong password")
-	ErrUsernameTaken = errors.New("username is already taken")
-	ErrEmailTaken    = errors.New("email address is already taken")
+	ErrWrongPasswordOrUser = errors.New("Wrong username or password")
+	ErrUsernameTaken       = errors.New("Username is already taken")
+	ErrEmailTaken          = errors.New("Email address is already taken")
 )
 
 const sessionTime = time.Hour * 6
@@ -110,11 +108,11 @@ func (s *AuthService) UserByToken(token string) (models.User, error) {
 func (s *AuthService) checkUser(username, password string) (models.User, error) {
 	user, err := s.repo.GetUser(username, "")
 	if err != nil {
-		return user, ErrNoUser
+		return user, ErrWrongPasswordOrUser
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return user, ErrWrongPassword
+		return user, ErrWrongPasswordOrUser
 	}
 
 	return user, nil

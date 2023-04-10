@@ -1,0 +1,23 @@
+* {box-sizing: border-box;}
+body { 
+  margin: 0;
+  font-family: "Quicksand", sans-serif;
+  display: grid;
+  /* place-items: center; */
+  /* height: 100vh; */
+  background: #7f7fd5;
+  background: linear-gradient(to right, #91eae4, #86a8e7, #7f7fd5);
+}
+
+.vote {
+  background: url(../img/like.png) no-repeat;
+  background-size: 100%;
+  width: 20px;
+  height: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.vote-dislike {
+  rotate: 180deg;
+}

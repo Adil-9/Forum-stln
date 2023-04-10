@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ErrInvalidEmail    = errors.New("invalid email address")
-	ErrInvalidPassword = errors.New("invalid password")
-	ErrInvalidUsername = errors.New("invalid username")
+	ErrInvalidEmail    = errors.New("Invalid email address")
+	ErrInvalidPassword = errors.New("Invalid password")
+	ErrInvalidUsername = errors.New("Invalid username")
 )
 
 func checkUserInfo(user models.User) error {

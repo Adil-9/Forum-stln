@@ -1,10 +1,9 @@
 package delivery
 
 import (
+	"forum/internal/models"
 	"net/http"
 	"strconv"
-
-	"forum/internal/models"
 )
 
 func (h *Handler) homePage(w http.ResponseWriter, r *http.Request) {
@@ -40,12 +39,11 @@ func (h *Handler) homePage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := models.TemplateData{
-			User:     user,
-			Posts:    posts,
-			Template: "index",
+			User:  user,
+			Posts: posts,
 		}
 
-		if err := h.tmpl.ExecuteTemplate(w, "base", data); err != nil {
+		if err := h.tmpl.ExecuteTemplate(w, "home", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 			return
 		}
@@ -70,11 +68,15 @@ func (h *Handler) homePage(w http.ResponseWriter, r *http.Request) {
 
 		id, err := strconv.Atoi(postID[0])
 		if err != nil {
-			h.errorPage(w, http.StatusInternalServerError, nil)
+			h.errorPage(w, http.StatusBadRequest, nil)
 			return
 		}
 
 		if err := h.services.Reaction.ReactToPost(id, user.ID, react[0]); err != nil {
+			if err.Error() == http.StatusText(http.StatusBadRequest) {
+				h.errorPage(w, http.StatusBadRequest, nil)
+				return
+			}
 			h.errorPage(w, http.StatusInternalServerError, nil)
 			return
 		}

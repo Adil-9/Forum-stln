@@ -1,0 +1,126 @@
+{{define "post-comments"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/templates/styles/fullpost.css">
+    <link rel="stylesheet" href="/templates/styles/header.css">
+    <link rel="stylesheet" href="/templates/styles/body.css">
+    <script src="https://use.fontawesome.com/fe459689b4.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <title>Main</title>
+</head>
+
+<body>
+    <div class="header">
+        <a href="/" class="logo">Forum</a>
+    </div>
+
+    <div class="container-link">
+        <div class="post">
+            <div class="post-head">
+                <span id="username">{{.Post.Author}}</span>
+                <!-- <span id="date">date</span> -->
+            </div>
+
+            <div class="content-post">
+                <div class="title-post">
+                    {{.Post.Title}}
+                </div>
+
+                <pre class="content">{{.Post.Content}}</pre>
+            </div>
+            <!-- <div>
+            <span id="category">categroy</span>
+        </div> -->
+            <div class="post-foot">
+                <form action="/posts/react/{{.Post.ID}}" method="post">
+                    <button class="btn" id="green" name="react" value="1" {{ if not .User.Username }} disabled {{ end
+                        }}><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i></button>{{.Post.LikeCount}}
+                    <button class="btn" id="red" name="react" value="-1" {{ if not .User.Username }} disabled {{ end
+                        }}><i class="fa fa-thumbs-down fa-lg" aria-hidden="true"></i></button>{{.Post.DislikeCount}}
+                </form>
+            </div>
+        </div>
+
+        <div class="comment-zone">
+
+            <section class="content-item" id="comments">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            {{if .User.Username}}
+                            <form method="post" action="/posts/{{.Post.ID}}">
+                                <h3 class="pull-left">New Comment</h3>
+                                <button type="submit" class="btn btn-normal pull-right">Submit</button>
+                                <fieldset>
+                                    <div class="row">
+                                        <div class="form-group col-xs-12 col-sm-9 col-lg-10">
+                                            <textarea class="form-control" id="message" placeholder="Your message"
+                                                required="" name="comment"></textarea>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            {{end}}
+                            <h3>For Comments</h3>
+                            {{if .Comments}}
+                            {{$username := .User.Username}}
+                            {{range .Comments}}
+                            <!-- COMMENT 1 - START -->
+                            <div class="media">
+                                <div class="media-body">
+                                    <h4>{{.Author}}</h4>
+                                    <p>{{.Content}} </p>
+                                    <table>
+                                        <tr>
+                                            <th>
+                                                <form action="/comment/react/{{.ID}}" method="post">
+                                                    <ul class="list-unstyled list-inline media-detail pull-left">
+                                                        <li>
+                                                            <button name="commentID" value="{{.ID}}" type="submit" {{ if not
+                                                            $username }} disabled {{ end }}>
+                                                            <input type="hidden" name="react" value="1">
+                                                            <i class="fa fa-thumbs-up"></i>{{.LikeCount}}
+                                                        </button>
+                                                    </li>                                                    
+                                                    </ul>
+                                                </form>
+                                            </th>
+                                            <th>
+                                                <form action="/comment/react/{{.ID}}" method="post" style="all: none;">
+                                                    <ul class="list-unstyled list-inline media-detail pull-left">
+                                                        <li>
+                                                            <button name="commentID" value="{{.ID}}" type="submit" {{ if not
+                                                                $username }} disabled {{ end }}>
+                                                                <input type="hidden" name="react" value="-1">
+                                                                <i class="fa fa-thumbs-down"></i>{{.DislikeCount}}
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </form>
+                                            </th>
+                                        </tr>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                            <!-- COMMENT 1 - END -->
+                            {{end}}
+                            {{end}}
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+</body>
+
+</html>
+{{end}}

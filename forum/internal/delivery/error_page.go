@@ -1,10 +1,9 @@
 package delivery
 
 import (
+	"forum/internal/models"
 	"log"
 	"net/http"
-
-	"forum/internal/models"
 )
 
 func (h *Handler) errorPage(w http.ResponseWriter, status int, err error) {

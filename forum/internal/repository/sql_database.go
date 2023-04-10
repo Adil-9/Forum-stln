@@ -60,12 +60,6 @@ func createTables(db *sql.DB) error {
 			PostID INTEGER NOT NULL,
 			Category TEXT NOT NULL
 		);
-		CREATE TABLE IF NOT EXISTS IMAGES(
-			ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			PostID INTEGER,
-			Image TEXT,
-			FOREIGN KEY(PostID) REFERENCES POSTS(ID)
-		)
 	`
 	if _, err := db.Exec(query); err != nil {
 		return err

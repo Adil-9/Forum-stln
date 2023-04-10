@@ -3,13 +3,12 @@ package delivery
 import (
 	"errors"
 	"fmt"
+	"forum/internal/models"
+	"forum/internal/service"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"forum/internal/models"
-	"forum/internal/service"
 )
 
 func IDFromURL(url, prefix string) (int, error) {
@@ -42,13 +41,12 @@ func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := models.TemplateData{
-			Template: "post-page",
 			User:     user,
 			Post:     post,
 			Comments: comments,
 		}
 
-		if err := h.tmpl.ExecuteTemplate(w, "base", data); err != nil {
+		if err := h.tmpl.ExecuteTemplate(w, "post-comments", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 		}
 	case http.MethodPost:
@@ -99,11 +97,10 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		data := models.TemplateData{
-			Template: "create-post",
-			User:     user,
+			User: user,
 		}
 
-		if err := h.tmpl.ExecuteTemplate(w, "base", data); err != nil {
+		if err := h.tmpl.ExecuteTemplate(w, "create-post", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 			return
 		}
@@ -121,23 +118,11 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		images := r.MultipartForm.File["image"]
-		paths, err := service.SaveImages(images)
-		if err != nil {
-			if errors.Is(err, service.ErrImgSize) || errors.Is(err, service.ErrImgFormat) {
-				h.errorPage(w, http.StatusBadRequest, err)
-				return
-			}
-			h.errorPage(w, http.StatusInternalServerError, err)
-			return
-		}
-
 		post := models.Post{
 			Title:      title[0],
 			AuthorID:   user.ID,
 			Content:    content[0],
 			Categories: category,
-			ImagesPath: paths,
 		}
 
 		if err := h.services.Post.CreatePost(post); err != nil {
@@ -191,7 +176,11 @@ func (h *Handler) reactToPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.services.Reaction.ReactToPost(id, user.ID, reaction[0]); err != nil {
-		h.errorPage(w, http.StatusInternalServerError, err)
+		if err.Error() == http.StatusText(http.StatusBadRequest) {
+			h.errorPage(w, http.StatusBadRequest, nil)
+			return
+		}
+		h.errorPage(w, http.StatusInternalServerError, nil)
 		return
 	}
 

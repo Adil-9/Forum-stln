@@ -1,0 +1,120 @@
+{{define "home"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/templates/styles/home.css">
+  <link rel="stylesheet" href="/templates/styles/header.css">
+  <link rel="stylesheet" href="/templates/styles/body.css">
+
+
+  <title>Main</title>
+</head>
+
+<body>
+  <div class="header">
+    <a href="/" class="logo">Forum</a>
+    <div class="header-right">
+      {{if .User.Username}}
+      <a href="/my-posts">My Posts</a>
+      <a href="/liked-posts">Liked Posts</a>
+      <a href="/posts/create">New Post</a>
+      <a href="/sign-out">Log out</a>
+      {{else}}
+      <a href="/sign-in">Login</a>
+      <a href="/sign-up">Register</a>
+      <!--if not logged in-->
+      {{end}}
+    </div>
+  </div>
+
+  <div class="container-link">
+    <div class="filter">
+      <div class="category-link">
+        <a href="/?category=alem">Alem</a>
+      </div>
+      <div class="category-link">
+        <a href="/?category=golang">Golang</a>
+      </div>
+      <div class="category-link">
+        <a href="/?category=java">Java</a>
+      </div>
+      <div class="category-link">
+        <a href="/?category=rust">Rust</a>
+      </div>
+      <div class="category-link">
+        <a href="/?category=php">Php</a>
+      </div>
+      <div class="category-link">
+        <a href="/?category=python">Python</a>
+      </div>
+      <div class="category-link">
+        <a href="/?category=other">Other</a>
+      </div>
+    </div>
+  </div>
+
+  {{if .Posts }}
+  {{$username := .User.Username}}
+  {{range .Posts}}
+  <section class="cards">
+
+    <article class="horizontal card">
+      <div class="card__content">
+        <div class="card__type">{{.Author}}</div>
+        <div class="card__title">{{.Title}} </div>
+        <!-- <div class="card__date">Date</div> -->
+        <div class="card__excerpt">
+          {{.Content}}
+        </div>
+        <div class="card__tags">
+          <table>
+            <tr>
+              <th>
+                <form method="post">
+                  <p>Likes: {{.LikeCount}}</p>
+                  <button name="postID" value="{{.ID}}" type="submit" class="vote" {{ if not $username}} disabled {{ end
+                    }}>
+                    <i aria-hidden="true"></i>
+                    <input type="hidden" name="react" value="1">
+                  </button>
+                </form>
+              </th>
+              <th>
+                <form method="post">
+                  <p>Dislikes: {{.DislikeCount}}</p>
+                  <button name="postID" value="{{.ID}}" type="submit" class="vote vote-dislike" {{ if not $username}}
+                    disabled {{ end }}>
+                    <i aria-hidden="true"></i>
+                    <input type="hidden" name="react" value="-1">
+                  </button>
+                </form>
+              </th>
+              <a href="/posts/{{.ID}}">Comments: {{.CommentCount}}</a>
+
+            </tr>
+          </table>
+
+
+        </div>
+      </div>
+      <div class="card_category">
+        {{range .Categories}}
+        <a href="/?category={{.}}">{{.}}</a>
+        {{end}}
+      </div>
+    </article>
+
+  </section>
+  {{end}}
+  {{end}}
+
+
+
+</body>
+
+</html>
+{{end}}

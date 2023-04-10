@@ -1,7 +1,5 @@
 package models
 
-import "html/template"
-
 type Post struct {
 	ID           int
 	AuthorID     int
@@ -12,6 +10,5 @@ type Post struct {
 	Author       string
 	Title        string
 	Content      string
-	ImagesPath   []template.URL
 	Categories   []string
 }

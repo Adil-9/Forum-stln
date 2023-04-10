@@ -2,20 +2,18 @@ package delivery
 
 import (
 	"errors"
-	"net/http"
-	"time"
-
+	"fmt"
 	"forum/internal/models"
 	"forum/internal/service"
+	"net/http"
+	"time"
 )
 
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		data := models.TemplateData{
-			Template: "sign-up",
-		}
-		if err := h.tmpl.ExecuteTemplate(w, "base", data); err != nil {
+		data := models.TemplateData{}
+		if err := h.tmpl.ExecuteTemplate(w, "reg_page", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 			return
 		}
@@ -46,7 +44,11 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 			if errors.Is(err, service.ErrInvalidEmail) || errors.Is(err, service.ErrInvalidPassword) ||
 				errors.Is(err, service.ErrInvalidUsername) || errors.Is(err, service.ErrUsernameTaken) ||
 				errors.Is(err, service.ErrEmailTaken) {
-				h.errorPage(w, http.StatusBadRequest, err)
+				data := models.TemplateData{Error: models.ErrorMsg{Msg: fmt.Sprintf(err.Error())}}
+				if err := h.tmpl.ExecuteTemplate(w, "reg_page", data); err != nil {
+					h.errorPage(w, http.StatusInternalServerError, err)
+					return
+				}
 				return
 			} else {
 				h.errorPage(w, http.StatusInternalServerError, err)
@@ -62,10 +64,8 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		data := models.TemplateData{
-			Template: "sign-in",
-		}
-		if err := h.tmpl.ExecuteTemplate(w, "base", data); err != nil {
+		data := models.TemplateData{}
+		if err := h.tmpl.ExecuteTemplate(w, "sign-in", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 			return
 		}
@@ -85,8 +85,12 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 		session, err := h.services.Authorization.SetSession(username[0], password[0])
 		if err != nil {
-			if errors.Is(err, service.ErrNoUser) || errors.Is(err, service.ErrWrongPassword) {
-				h.errorPage(w, http.StatusUnauthorized, err)
+			if errors.Is(err, service.ErrWrongPasswordOrUser) {
+				data := models.TemplateData{Error: models.ErrorMsg{Msg: fmt.Sprintf(err.Error())}}
+				if err := h.tmpl.ExecuteTemplate(w, "sign-in", data); err != nil {
+					h.errorPage(w, http.StatusInternalServerError, err)
+					return
+				}
 				return
 			}
 			h.errorPage(w, http.StatusInternalServerError, err)
@@ -108,16 +112,6 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		h.errorPage(w, http.StatusNotFound, nil)
-		return
-	}
-
-	if r.Method != http.MethodPost {
-		h.errorPage(w, http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {

@@ -1,10 +1,9 @@
 package delivery
 
 import (
+	"forum/internal/service"
 	"html/template"
 	"net/http"
-
-	"forum/internal/service"
 )
 
 type Handler struct {

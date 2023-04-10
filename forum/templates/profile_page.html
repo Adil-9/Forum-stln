@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles/profile_page.css">
+    <title>Profile page</title>
+</head>
+
+<body>
+
+    <div class="header">
+      <a href="/" class="logo">Forum</a>
+      <div class="header-right">
+        <a class="active" href="/profile">Profile</a>
+        <a href="/post_page">New Post</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+    <h3>Profile</h3> 
+    {{if .User_email}}
+    <h3>User_email: {{.User_email}}</h3>
+    <h3>User_name: {{.User_name}}</h3>
+    {{else}}
+    {{end}}
+    <form>
+    <button formaction="/liked">liked posts</button>
+    <button formaction="/myposts">your posts</button>
+  </form>  
+  </body>
+</html>

@@ -3,9 +3,8 @@ package delivery
 import (
 	"context"
 	"fmt"
-	"net/http"
-
 	"forum/internal/models"
+	"net/http"
 )
 
 const contextKeyUser contextKey = "user"

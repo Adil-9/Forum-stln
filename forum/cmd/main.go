@@ -1,18 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"log"
-
 	"forum/internal/delivery"
 	"forum/internal/repository"
 	"forum/internal/server"
 	"forum/internal/service"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-const port = "8080"
 
 func main() {
 	db, err := repository.OpenSqliteDB("store.db")
@@ -20,14 +18,17 @@ func main() {
 		log.Fatalf("error while opening db: %s", err)
 	}
 
+	addr := flag.String("addr", ":8000", "HTTP network address")
+	flag.Parse()
+
 	repo := repository.NewRepository(db)
 	service := service.NewService(repo)
 	handler := delivery.NewHandler(service)
 	server := new(server.Server)
 
-	fmt.Printf("Starting server at port %s\nhttp://localhost:%s/\n", port, port)
+	fmt.Printf("Starting server at addr %s\nhttp://localhost%s/\n", *addr, *addr)
 
-	if err := server.Run(port, handler.InitRoutes()); err != nil {
+	if err := server.Run(*addr, handler.InitRoutes()); err != nil {
 		log.Fatalf("error while running the server: %s", err.Error())
 	}
 }

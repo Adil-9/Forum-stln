@@ -1,10 +1,11 @@
 package service
 
 import (
-	"strconv"
-
+	"errors"
 	"forum/internal/models"
 	"forum/internal/repository"
+	"net/http"
+	"strconv"
 )
 
 type Reaction interface {
@@ -25,7 +26,7 @@ func NewReactionService(repo repository.Reaction) *ReactionService {
 func (s *ReactionService) ReactToPost(postID, userID int, react string) error {
 	vote, err := strconv.Atoi(react)
 	if err != nil {
-		return err
+		return errors.New(http.StatusText(http.StatusBadRequest))
 	}
 
 	reaction := models.Reaction{

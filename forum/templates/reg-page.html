@@ -1,0 +1,51 @@
+{{ define "reg_page" }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/templates/styles/reg-page.css">
+    <title>Registration</title>
+</head>
+
+<body>
+    <div class="header">
+        <a href="/" class="logo">Forum</a>
+    </div>
+    <div class="outline">
+        <div class="wrapper">
+            <div class="title">Registration</div>
+            <form action="/sign-up" method="post">
+                {{if .Error}}
+                <div class="error">{{.Error.Msg}}</div>
+                {{else}}
+                {{end}}
+                <div class="field">
+                    <input type="text" required name="username">
+                    <label>Username</label>
+                </div>
+                <div class="field">
+                    <input type="text" required name="email">
+                    <label>Email Address</label>
+                </div>
+                <div class="field">
+                    <input type="password" required name="password">
+                    <label>Password</label>
+                </div>
+                <div class="field">
+                    <input type="password" required name="confirm_password">
+                    <label>Password</label>
+                </div><br>
+                <div class="field">
+                    <input type="submit" value="Register">
+                </div>
+                <div class="signup-link">Already have an account? <a href="/sign-in">Sign in</a></div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}
