@@ -18,16 +18,10 @@
     <div class="header">
         <a href="/" class="logo">Forum</a>
         <div class="header-right">
-            {{if .User.Username}}
-            <a href="/profile">Profile</a>
-            <a  class="active" href="/post_page">New Post</a>
-            <a href="/logout">Log out</a>
-            {{else}}
-            <a href="/login">Profile</a>
-            <a class="active" href="/login">New Post</a>
-            <a href="/login">Login</a> <!--if not logged in-->
-            <a href="/registration">Register</a> <!--if not logged in-->
-            {{end}}
+            <a href="/my-posts">My Posts</a>
+            <a href="/liked-posts">Liked Posts</a>
+            <a href="/posts/create">New Post</a>
+            <a href="/sign-out">Log out</a>
         </div>
     </div>
     <div class="row">

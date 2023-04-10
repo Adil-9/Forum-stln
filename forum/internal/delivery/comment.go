@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (h *Handler) reactComment(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) reactToComment(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		h.errorPage(w, http.StatusNotFound, nil)
 		return

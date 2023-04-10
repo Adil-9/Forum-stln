@@ -25,7 +25,7 @@ func (h *Handler) errorPage(w http.ResponseWriter, status int, err error) {
 		},
 	}
 
-	if err := h.tmpl.ExecuteTemplate(w, "error.html", data); err != nil {
+	if err := h.tmpl.ExecuteTemplate(w, "error-page", data); err != nil {
 		http.Error(w, http.StatusText(status), status)
 		return
 	}

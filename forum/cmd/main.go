@@ -21,8 +21,8 @@ func main() {
 	addr := flag.String("addr", ":8000", "HTTP network address")
 	flag.Parse()
 
-	repo := repository.NewRepository(db)
-	service := service.NewService(repo)
+	repository := repository.NewRepository(db)
+	service := service.NewService(repository)
 	handler := delivery.NewHandler(service)
 	server := new(server.Server)
 

@@ -3,8 +3,8 @@ package delivery
 import (
 	"errors"
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
+	m "forum/internal/models"
+	s "forum/internal/service"
 	"net/http"
 	"time"
 )
@@ -12,7 +12,7 @@ import (
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		data := models.TemplateData{}
+		data := m.TemplateData{}
 		if err := h.tmpl.ExecuteTemplate(w, "reg_page", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 			return
@@ -33,7 +33,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		user := models.User{
+		user := m.User{
 			Email:           email[0],
 			Username:        username[0],
 			Password:        password[0],
@@ -41,10 +41,10 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := h.services.Authorization.CreateUser(user); err != nil {
-			if errors.Is(err, service.ErrInvalidEmail) || errors.Is(err, service.ErrInvalidPassword) ||
-				errors.Is(err, service.ErrInvalidUsername) || errors.Is(err, service.ErrUsernameTaken) ||
-				errors.Is(err, service.ErrEmailTaken) {
-				data := models.TemplateData{Error: models.ErrorMsg{Msg: fmt.Sprintf(err.Error())}}
+			if errors.Is(err, s.ErrInvalidEmail) || errors.Is(err, s.ErrInvalidPassword) ||
+				errors.Is(err, s.ErrInvalidUsername) || errors.Is(err, s.ErrUsernameTaken) ||
+				errors.Is(err, s.ErrEmailTaken) {
+				data := m.TemplateData{Error: m.ErrorMsg{Msg: fmt.Sprint(err.Error())}}
 				if err := h.tmpl.ExecuteTemplate(w, "reg_page", data); err != nil {
 					h.errorPage(w, http.StatusInternalServerError, err)
 					return
@@ -64,7 +64,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		data := models.TemplateData{}
+		data := m.TemplateData{}
 		if err := h.tmpl.ExecuteTemplate(w, "sign-in", data); err != nil {
 			h.errorPage(w, http.StatusInternalServerError, err)
 			return
@@ -85,8 +85,8 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 		session, err := h.services.Authorization.SetSession(username[0], password[0])
 		if err != nil {
-			if errors.Is(err, service.ErrWrongPasswordOrUser) {
-				data := models.TemplateData{Error: models.ErrorMsg{Msg: fmt.Sprintf(err.Error())}}
+			if errors.Is(err, s.ErrWrongPasswordOrUser) {
+				data := m.TemplateData{Error: m.ErrorMsg{Msg: fmt.Sprint(err.Error())}}
 				if err := h.tmpl.ExecuteTemplate(w, "sign-in", data); err != nil {
 					h.errorPage(w, http.StatusInternalServerError, err)
 					return
@@ -111,7 +111,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {

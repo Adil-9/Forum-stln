@@ -3,8 +3,8 @@ package delivery
 import (
 	"errors"
 	"fmt"
-	"forum/internal/models"
-	"forum/internal/service"
+	m "forum/internal/models"
+	s "forum/internal/service"
 	"log"
 	"net/http"
 	"strconv"
@@ -15,8 +15,8 @@ func IDFromURL(url, prefix string) (int, error) {
 	return strconv.Atoi(strings.TrimPrefix(url, prefix))
 }
 
-func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(contextKeyUser).(models.User)
+func (h *Handler) posts(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value(contextKeyUser).(m.User)
 	postID, err := IDFromURL(r.URL.Path, "/posts/")
 	if err != nil {
 		h.errorPage(w, http.StatusNotFound, fmt.Errorf("error getting post ID: %s", err))
@@ -27,7 +27,7 @@ func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		post, err := h.services.Post.PostById(postID, user.ID)
 		if err != nil {
-			if errors.Is(err, service.ErrNoPost) {
+			if errors.Is(err, s.ErrNoPost) {
 				h.errorPage(w, http.StatusNotFound, nil)
 				return
 			}
@@ -40,7 +40,7 @@ func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
 			log.Printf("error getting comments by post ID: %s", err)
 		}
 
-		data := models.TemplateData{
+		data := m.TemplateData{
 			User:     user,
 			Post:     post,
 			Comments: comments,
@@ -50,7 +50,7 @@ func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
 			h.errorPage(w, http.StatusInternalServerError, err)
 		}
 	case http.MethodPost:
-		if user == (models.User{}) {
+		if user == (m.User{}) {
 			h.errorPage(w, http.StatusUnauthorized, nil)
 			return
 		}
@@ -66,14 +66,14 @@ func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		comment := models.Comment{
+		comment := m.Comment{
 			UserID:  user.ID,
 			PostID:  postID,
 			Content: commentContent[0],
 		}
 
 		if err := h.services.Commentary.CreateComment(comment); err != nil {
-			if errors.Is(err, service.ErrEmptyComment) {
+			if errors.Is(err, s.ErrEmptyComment) {
 				h.errorPage(w, http.StatusBadRequest, err)
 				return
 			}
@@ -88,15 +88,15 @@ func (h *Handler) postPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(contextKeyUser).(models.User)
-	if user == (models.User{}) {
+	user := r.Context().Value(contextKeyUser).(m.User)
+	if user == (m.User{}) {
 		h.errorPage(w, http.StatusUnauthorized, nil)
 		return
 	}
 
 	switch r.Method {
 	case http.MethodGet:
-		data := models.TemplateData{
+		data := m.TemplateData{
 			User: user,
 		}
 
@@ -118,7 +118,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		post := models.Post{
+		post := m.Post{
 			Title:      title[0],
 			AuthorID:   user.ID,
 			Content:    content[0],
@@ -126,7 +126,7 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := h.services.Post.CreatePost(post); err != nil {
-			if errors.Is(err, service.ErrEmptyPost) {
+			if errors.Is(err, s.ErrEmptyPost) {
 				h.errorPage(w, http.StatusBadRequest, err)
 				return
 			}
@@ -140,10 +140,10 @@ func (h *Handler) createPost(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) reactToPost(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(contextKeyUser).(models.User)
+func (h *Handler) reaction(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value(contextKeyUser).(m.User)
 
-	if user == (models.User{}) {
+	if user == (m.User{}) {
 		h.errorPage(w, http.StatusUnauthorized, nil)
 		return
 	}
